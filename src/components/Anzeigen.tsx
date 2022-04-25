@@ -1,7 +1,14 @@
 
-import React from "react"
+import React, {useState} from "react"
 import { server } from '../utils/api/server'
-import { ListingsData, DeleteListingData, DeleteListingVariables } from "../utils/types"
+import { ListingsData, DeleteListingData, DeleteListingVariables, Listing } from "../utils/types"
+import AnzeigenSkeleton from './AnzeigenSkeleton'
+
+//style
+import List from "antd/es/list"
+import Avatar from "antd/es/avatar"
+import Button from "antd/es/button"
+import "./anzeigen.css"
 
 interface Props {
   title: string;
@@ -26,9 +33,12 @@ const DELETE_ANZEIGE = `
 `
 
 const Anzeigen = ({ title }: Props) => { //or ({title}: Props)
+  const [anzeigen, setAnzeigen] = useState<Listing[] >([])
+
   const fetchDataHandler = async () => {
     const { data } = await server.fetch<ListingsData>({ query: FIRST_QUERY })
-    console.log("listings", data.listings)
+    console.log("listings", data?.listings)
+    setAnzeigen(data?.listings)
   }
 
   const deleteHandler = async () => {
@@ -41,8 +51,9 @@ const Anzeigen = ({ title }: Props) => { //or ({title}: Props)
     console.log("data", data)
   }
 
+
   return (
-    <div>
+    <div className="listings">
       {title}
       <button onClick={fetchDataHandler}>
         get data
@@ -50,6 +61,23 @@ const Anzeigen = ({ title }: Props) => { //or ({title}: Props)
       <button onClick={deleteHandler}>
         delete
       </button>
+      {!anzeigen?.length && <AnzeigenSkeleton title={"kek"}/>}
+
+
+      <List 
+        itemLayout="horizontal"
+        dataSource={anzeigen}
+        renderItem={(listing) => (
+          <List.Item actions={[<Button type="primary" onClick={deleteHandler}>Delete</Button>]}>
+            <List.Item.Meta 
+            title={listing.title} 
+            description={listing.price}
+            avatar={<Avatar src={listing.image} shape="square" size={48} />}
+            
+            />
+          </List.Item>
+        )}
+      />
     </div>
   )
 }

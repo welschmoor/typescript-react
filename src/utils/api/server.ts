@@ -13,7 +13,7 @@ export const server = {
       },
       body: JSON.stringify(body)
     });
-    return res.json() as Promise<{ data: TData }>
+    return res.json() as Promise<{ data: TData } >
   }
 }
 
